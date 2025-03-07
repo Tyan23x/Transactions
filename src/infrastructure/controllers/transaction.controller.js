@@ -1,65 +1,56 @@
-const express = require('express');
-const router = express.Router();
-const { createTransaction, findAllTransactions,findTransactionById,updateTransaction,deleteTransaction} = require('../../application/transaction.service');
+const TransactionRepository = require('../repository/transactionRepository');
+const CreateTransactionUseCase = require('../../application/useCase/createTransaction');
+const GetTransactionByIdUseCase = require('../../application/useCase/GetTransactionById');
+const ListTransactionsUseCase = require('../../application/useCase/ListTransactions');
+const UpdateTransactionStatusUseCase = require('../../application/useCase/UpdateTracsaction');
 
-router.post('/', async (req, res) => {
-  try {
-    const transaction = await createTransaction(req.body);
-    res.status(201).json(transaction);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
 
-router.get('/', async (req, res) => {
-  try {
-    const transactions = await findAllTransactions();
-    res.status(200).json(transactions);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener las transacciones' });
-  }
-});
+const transactionRepository = new TransactionRepository();
+const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository);
+const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
+const listTransactionsUseCase = new ListTransactionsUseCase(transactionRepository);
+const updateTransactionStatusUseCase = new UpdateTransactionStatusUseCase(transactionRepository);
 
-// Obtener una transacción por ID
-router.get('/:id', async (req, res) => {
-  try {
-    const transaction = await findTransactionById(req.params.id);
-    if (!transaction) {
-      return res.status(404).json({ message: 'Transacción no encontrada' });
+class TransactionController {
+  static async createTransaction(req, res) {
+    try {
+      const transaction = await createTransactionUseCase.execute(req.body);
+      res.status(201).json(transaction);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    res.json(transaction);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener la transacción', error });
   }
-});
 
-// Actualizar una transacción
-router.put('/:id', async (req, res) => {
-  try {
-    const transaction = await updateTransaction(req.params.id, req.body);
-    if (!transaction) {
-      return res.status(404).json({ message: 'Transacción no encontrada' });
+  static async getTransactionById(req, res) {
+    try {
+      const transaction = await getTransactionByIdUseCase.execute(req.params.id);
+      if (!transaction) return res.status(404).json({ message: 'Transaction not found' });
+      res.json(transaction);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    res.json(transaction);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar la transacción', error });
   }
-});
 
-
-// Eliminar una transacción
-router.delete('/:id', async (req, res) => {
-  try {
-    const deleted = await deleteTransaction(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ message: 'Transacción no encontrada' });
+  static async listTransactions(req, res) {
+    try {
+      const transactions = await listTransactionsUseCase.execute();
+      res.json(transactions);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    res.json({ message: 'Transacción eliminada' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error al eliminar la transacción', error });
   }
-});
 
+  static async updateTransactionStatus(req, res) {
+    try {
+      const { estado } = req.body;
+      const updatedTransaction = await updateTransactionStatusUseCase.execute(req.params.id, estado);
+      if (!updatedTransaction) return res.status(404).json({ message: 'Transaction not found' });
+      res.json(updatedTransaction);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 
+}
 
-module.exports = router;
+module.exports = TransactionController;

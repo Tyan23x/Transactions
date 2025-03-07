@@ -25,6 +25,7 @@ const Transaction = sequelize.define('Transaction', {
   },
 }, {
   timestamps: true,
+  tableName: 'transactions', 
 });
 
 module.exports = Transaction;
