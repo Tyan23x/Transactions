@@ -9,7 +9,7 @@ app.use(express.json());
 app.use('/cuentas', accountRouter);
 app.use('/transacciones', transactionRouter);
 
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ alter: true }).then(() => {
   console.log('Base de datos sincronizada');
   app.listen(4000, () => console.log('Servidor corriendo en http://localhost:4000'));
 }).catch((err) => {
