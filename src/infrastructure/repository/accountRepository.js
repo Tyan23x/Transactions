@@ -20,6 +20,10 @@ class AccountRepositoryPostgres {
     // Actualizar saldo de la cuenta
     return await Account.update({ saldo }, { where: { id: accountId } });
   }
+
+  async findUserby(token){
+    return await Transaction.findOne({where: {token: token}});
+  }
 }
 
 module.exports = new AccountRepositoryPostgres();

@@ -3,6 +3,7 @@ const CreateTransactionUseCase = require('../../application/useCase/createTransa
 const GetTransactionByIdUseCase = require('../../application/useCase/GetTransactionById');
 const ListTransactionsUseCase = require('../../application/useCase/ListTransactions');
 const UpdateTransactionStatusUseCase = require('../../application/useCase/UpdateTracsaction');
+const ValidateUserByToken = require('../../application/services/user.service')
 
 
 const transactionRepository = new TransactionRepository();
@@ -10,6 +11,7 @@ const createTransactionUseCase = new CreateTransactionUseCase(transactionReposit
 const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
 const listTransactionsUseCase = new ListTransactionsUseCase(transactionRepository);
 const updateTransactionStatusUseCase = new UpdateTransactionStatusUseCase(transactionRepository);
+const validateUserByToken = new ValidateUserByToken(transactionRepository);
 
 class TransactionController {
   static async createTransaction(req, res) {
