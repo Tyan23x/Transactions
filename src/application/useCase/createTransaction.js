@@ -10,6 +10,7 @@ class CreateTransactionUseCase {
     const t = await sequelize.transaction();
 
     try {
+
       // Verificar si las cuentas existen
       const origen = await this.accountRepository.getById(cuenta_origen);
       const destino = await this.accountRepository.getById(cuenta_destino);
